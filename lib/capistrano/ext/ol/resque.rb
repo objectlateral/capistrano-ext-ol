@@ -6,4 +6,6 @@ Capistrano::Configuration.instance.load do
       run "if [ -f #{pid} ]; then kill -s QUIT `cat #{pid}` && rm -f #{pid}; fi"
     end
   end
+
+  after "deploy:restart", "resque:restart"
 end
