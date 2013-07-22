@@ -5,9 +5,9 @@ Capistrano::Configuration.instance.load do
       run "#{try_sudo} mkdir -p #{shared_path}/config"
     end
 
-    desc "updates symlinks for yml configs found in shared directory"
+    desc "updates symlinks for all files in shared config directory"
     task :symlink do
-      run "for f in `find #{shared_path}/config -maxdepth 1 -name *.yml`; do ln -nfs $f #{release_path}/config/`basename $f`; done"
+      run "for f in `find #{shared_path}/config -maxdepth 1`; do ln -nfs $f #{release_path}/config/`basename $f`; done"
     end
   end
 
