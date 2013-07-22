@@ -2,10 +2,11 @@ class DbDumper < Struct.new :config, :application
   def initialize *args
     super
 
-    case config["adapter"]
-    when "postgresql" then @adapter = PgDumper.new
+    @adapter = case config["adapter"]
+    when "postgresql"      then PgDumper.new
+    when "mysql", "mysql2" then MySqlDumper.new
     else
-      raise "Only Postgres is supported atm"
+      raise "Only Postgres/MySQL is supported atm"
     end
   end
 
@@ -14,8 +15,8 @@ class DbDumper < Struct.new :config, :application
     @adapter.dump_command config, file
   end
 
-  def restore_to user, db
-    @adapter.restore_command user, db, file
+  def restore_to config
+    @adapter.restore_command config, file
   end
 
   def file
@@ -33,9 +34,33 @@ class PgDumper
     %{pg_dump -x -Fc #{config["database"]} -f #{file}}
   end
 
-  def restore_command user, db, file
-    %{pg_restore --clean --no-acl --no-owner -U #{user} -d #{db} #{file}}
+  def restore_command config, file
+    %{pg_restore --clean --no-acl --no-owner -U #{config["username"]} -d #{config["database"]} #{file}}
   end
 
   def file_ext; "psql"; end
+end
+
+class MySqlDumper
+  def dump_command config, file
+    %{mysqldump #{args(config)} #{config["database"]} > #{file}}
+  end
+
+  def restore_command config, file
+    %{mysql #{args(config)} #{config["database"]} < #{file}}
+  end
+
+  def file_ext; "sql"; end
+
+  private
+
+  def args config
+    args = ["--user=#{config["username"]}"]
+
+    if password = config["password"]
+      args.push "--password=#{password}"
+    end
+
+    args.join " "
+  end
 end

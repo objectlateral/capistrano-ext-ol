@@ -5,7 +5,7 @@ Capistrano::Configuration.instance.load do
     def get_remote_config
       config = capture "cat #{shared_path}/config/database.yml"
       remote_env = exists?(:stage) ? stage : rails_env
-      YAML::load(config)[remote_env]
+      YAML::load(config)[remote_env.to_s]
     end
 
     def get_local_config
@@ -23,7 +23,7 @@ Capistrano::Configuration.instance.load do
       get dumper.file, dumper.file
       run dumper.rm_file
 
-      system dumper.restore_to local["username"], local["database"]
+      system dumper.restore_to local
       system dumper.rm_file
     end
 
