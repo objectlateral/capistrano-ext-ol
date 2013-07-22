@@ -34,6 +34,7 @@ Capistrano::Configuration.instance.load do
       dumper = DbDumper.new remote, application
 
       on_rollback { dumper.rm_file }
+      run "mkdir -p #{shared_path}/backup"
       run dumper.dump_to "#{shared_path}/backup"
     end
   end
