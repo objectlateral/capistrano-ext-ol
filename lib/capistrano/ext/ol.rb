@@ -5,5 +5,5 @@ unless Capistrano::Configuration.respond_to? :instance
 end
 
 %w(config db passenger resque).each do |recipe|
-  require "capistrano/ext/#{recipe}"
+  require "capistrano/ext/ol/#{recipe}"
 end
