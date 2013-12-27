@@ -3,7 +3,7 @@ class DbDumper < Struct.new :config, :application
     super
 
     @adapter = case config["adapter"]
-    when "postgresql"      then PgDumper.new
+    when "postgresql", "postgis" then PgDumper.new
     when "mysql", "mysql2" then MySqlDumper.new
     else
       raise "Only Postgres/MySQL is supported atm"
